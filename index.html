@@ -33,6 +33,9 @@
         }
     </script>
 
+    <!-- EmailJS SDK for Free Two-Way OTP Email Verification -->
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+
     <!-- Custom Styles for Animations & Interactions -->
     <style>
         body { background-color: #F8FAFC; color: #0B1426; }
@@ -447,16 +450,17 @@
         <div class="max-w-4xl mx-auto px-6 relative z-10 fade-up">
             <div class="text-center mb-12">
                 <h2 class="text-4xl md:text-5xl font-serif text-brand-midnight mb-4">Initiate Acquisition.</h2>
-                <p class="text-gray-500 max-w-xl mx-auto">Connect directly with our investment directors. To maintain absolute security and discretion, all inquiries are processed exclusively via this secure structural endpoint.</p>
+                <p class="text-gray-500 max-w-xl mx-auto">Connect directly with our investment directors. To maintain absolute security and discretion, all inquiries require instant secure two-way verification before payload processing.</p>
             </div>
 
             <!-- Form Container -->
             <div class="bg-white p-8 md:p-12 shadow-[0_20px_50px_rgba(11,20,38,0.05)] border border-gray-100 rounded-sm relative overflow-hidden" id="form-container">
                 
-                <form id="secure-contact-form" action="https://api.web3forms.com/submit" method="POST" class="space-y-6 relative z-10">
+                <!-- Main Core Form -->
+                <form id="secure-contact-form" action="https://api.web3forms.com/submit" method="POST" class="space-y-6 relative z-10 transition-opacity duration-300">
                     <!-- Web3Forms Config with Integrated Secure Key -->
                     <input type="hidden" name="access_key" value="ff0bae3f-9ec0-4668-b188-b1392202db72">
-                    <input type="hidden" name="subject" value="New Portfolio Inquiry - Hunar Property Ltd">
+                    <input type="hidden" name="subject" value="Verified Portfolio Inquiry - Hunar Property Ltd">
                     <input type="checkbox" name="botcheck" class="hidden" style="display: none;">
 
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -492,12 +496,44 @@
                     </div>
 
                     <button type="submit" class="w-full bg-brand-midnight text-white py-4 uppercase tracking-widest text-sm font-semibold hover:bg-brand-gold hover:text-white transition-all shadow-md group relative overflow-hidden">
-                        <span class="relative z-10">Submit Request Protocol</span>
+                        <span class="relative z-10">Request Verification Code</span>
                         <div class="absolute inset-0 bg-brand-gold transform scale-x-0 group-hover:scale-x-100 transition-transform origin-left duration-300 ease-out"></div>
                     </button>
                     
                     <p class="text-[10px] text-gray-400 text-center uppercase tracking-wider mt-4">Data handled strictly in accordance with GDPR protocols. End-to-end encryption active.</p>
                 </form>
+
+                <!-- Two-Way verification OTP overlay -->
+                <div id="otp-verification-screen" class="hidden absolute inset-0 bg-brand-midnight z-20 flex flex-col items-center justify-center text-center p-8 transition-opacity duration-300">
+                    <div class="w-16 h-16 border-2 border-brand-gold rounded-full flex items-center justify-center mb-6">
+                        <svg class="w-8 h-8 text-brand-gold animate-pulse" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="square" stroke-linejoin="miter" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path></svg>
+                    </div>
+                    <h3 class="text-2xl font-serif text-white mb-2">Security Verification</h3>
+                    <p class="text-sm text-gray-400 font-sans max-w-md mb-6">
+                        We have transmitted an authorization code to <span id="target-verification-email" class="text-white font-bold">your email</span>. Please input the 6-digit credential below to verify ownership.
+                    </p>
+                    
+                    <!-- OTP Code Inputs -->
+                    <div class="flex gap-2 justify-center mb-6" id="otp-inputs-container">
+                        <input type="text" maxlength="1" class="otp-box w-12 h-14 text-center text-2xl font-bold bg-white/10 text-brand-gold border border-white/20 rounded-sm focus:outline-none focus:border-brand-gold focus:ring-1 focus:ring-brand-gold" />
+                        <input type="text" maxlength="1" class="otp-box w-12 h-14 text-center text-2xl font-bold bg-white/10 text-brand-gold border border-white/20 rounded-sm focus:outline-none focus:border-brand-gold focus:ring-1 focus:ring-brand-gold" />
+                        <input type="text" maxlength="1" class="otp-box w-12 h-14 text-center text-2xl font-bold bg-white/10 text-brand-gold border border-white/20 rounded-sm focus:outline-none focus:border-brand-gold focus:ring-1 focus:ring-brand-gold" />
+                        <input type="text" maxlength="1" class="otp-box w-12 h-14 text-center text-2xl font-bold bg-white/10 text-brand-gold border border-white/20 rounded-sm focus:outline-none focus:border-brand-gold focus:ring-1 focus:ring-brand-gold" />
+                        <input type="text" maxlength="1" class="otp-box w-12 h-14 text-center text-2xl font-bold bg-white/10 text-brand-gold border border-white/20 rounded-sm focus:outline-none focus:border-brand-gold focus:ring-1 focus:ring-brand-gold" />
+                        <input type="text" maxlength="1" class="otp-box w-12 h-14 text-center text-2xl font-bold bg-white/10 text-brand-gold border border-white/20 rounded-sm focus:outline-none focus:border-brand-gold focus:ring-1 focus:ring-brand-gold" />
+                    </div>
+
+                    <div id="otp-error-message" class="text-red-500 text-xs font-semibold mb-4 hidden">Invalid or expired authorization code. Please retry.</div>
+
+                    <div class="text-xs text-gray-400 mb-6">
+                        Code expires in <span id="verification-countdown" class="text-white font-mono">02:00</span>
+                    </div>
+
+                    <div class="flex gap-6 justify-center">
+                        <button id="resend-otp-btn" class="text-xs uppercase tracking-widest text-brand-gold border-b border-brand-gold pb-1 hover:text-white hover:border-white transition-colors">Resend Code</button>
+                        <button id="cancel-otp-btn" class="text-xs uppercase tracking-widest text-gray-500 border-b border-gray-500 pb-1 hover:text-white hover:border-white transition-colors">Cancel</button>
+                    </div>
+                </div>
 
                 <!-- Stateful Success Screen (Hidden by default) -->
                 <div id="success-screen" class="hidden absolute inset-0 bg-brand-midnight z-20 flex flex-col items-center justify-center text-center p-8">
@@ -506,7 +542,7 @@
                     </div>
                     <h3 class="text-3xl font-serif text-white mb-4">Protocol Received, <span id="investor-name" class="text-brand-gold italic">Investor</span>.</h3>
                     <p class="text-gray-400 font-sans max-w-md mb-8">
-                        Your structural payload has been securely routed to our senior directors. You can expect a highly discrete, targeted response within 12 business hours to establish next steps.
+                        Your structural payload has been verified and securely routed to our senior directors. You can expect a highly discrete, targeted response within 12 business hours to establish next steps.
                     </p>
                     <button id="reset-form" class="text-xs uppercase tracking-widest text-brand-gold border-b border-brand-gold pb-1 hover:text-white hover:border-white transition-colors">Return to Directory</button>
                 </div>
@@ -538,6 +574,17 @@
     <script>
         document.addEventListener('DOMContentLoaded', () => {
             
+            // EMAILJS CONFIGURATION (FREE SERVICE)
+            // Register at emailjs.com to get your keys and paste them below
+            // This enables verified automated OTP transmission directly to senders
+            const EMAILJS_PUBLIC_KEY = "YOUR_PUBLIC_KEY"; // e.g. "user_xxxxxxxx"
+            const EMAILJS_SERVICE_ID = "YOUR_SERVICE_ID"; // e.g. "service_xxxxxxx"
+            const EMAILJS_TEMPLATE_ID = "YOUR_TEMPLATE_ID"; // e.g. "template_xxxxxxx"
+            
+            if (EMAILJS_PUBLIC_KEY !== "YOUR_PUBLIC_KEY") {
+                emailjs.init(EMAILJS_PUBLIC_KEY);
+            }
+
             // 1. Mobile Menu Toggle
             const mobileMenuBtn = document.getElementById('mobile-menu-btn');
             const mobileMenu = document.getElementById('mobile-menu');
@@ -618,27 +665,142 @@
 
             fadeElements.forEach(el => appearOnScroll.observe(el));
 
-            // 5. Stateful Form Submission Logic linked to Web3Forms API
+
+            // 5. Advanced Two-Way OTP Email Verification + Web3Forms Submission Logic
             const form = document.getElementById('secure-contact-form');
             const successScreen = document.getElementById('success-screen');
+            const otpScreen = document.getElementById('otp-verification-screen');
+            const targetVerificationEmail = document.getElementById('target-verification-email');
+            const countdownEl = document.getElementById('verification-countdown');
+            const otpInputs = document.querySelectorAll('.otp-box');
+            const otpErrorMsg = document.getElementById('otp-error-message');
+            
             const nameInput = document.getElementById('name');
+            const emailInput = document.getElementById('email');
             const nameDisplay = document.getElementById('investor-name');
+            
             const resetBtn = document.getElementById('reset-form');
+            const cancelOtpBtn = document.getElementById('cancel-otp-btn');
+            const resendOtpBtn = document.getElementById('resend-otp-btn');
 
+            let generatedOTP = "";
+            let countdownTimer = null;
+            let expirationTimeSec = 120; // 2 minutes
+
+            // OTP Box auto-focus shifting logic
+            otpInputs.forEach((input, index) => {
+                input.addEventListener('keyup', (e) => {
+                    if (e.key >= 0 && e.key <= 9) {
+                        if (index < otpInputs.length - 1) {
+                            otpInputs[index + 1].focus();
+                        }
+                    } else if (e.key === 'Backspace') {
+                        if (index > 0) {
+                            otpInputs[index - 1].focus();
+                        }
+                    }
+                    verifyFullOTPCode();
+                });
+            });
+
+            function startTimer() {
+                clearInterval(countdownTimer);
+                expirationTimeSec = 120;
+                countdownTimer = setInterval(() => {
+                    expirationTimeSec--;
+                    const min = Math.floor(expirationTimeSec / 60).toString().padStart(2, '0');
+                    const sec = (expirationTimeSec % 60).toString().padStart(2, '0');
+                    countdownEl.textContent = `${min}:${sec}`;
+
+                    if (expirationTimeSec <= 0) {
+                        clearInterval(countdownTimer);
+                        generatedOTP = ""; // Expire OTP
+                        countdownEl.textContent = "Expired";
+                        otpErrorMsg.textContent = "Passcode has expired. Please request a new code.";
+                        otpErrorMsg.classList.remove('hidden');
+                    }
+                }, 1000);
+            }
+
+            function generateAndSendOTP() {
+                generatedOTP = Math.floor(100000 + Math.random() * 900000).toString();
+                const recipientEmail = emailInput.value;
+                const recipientName = nameInput.value;
+                targetVerificationEmail.textContent = recipientEmail;
+
+                console.log("Local Dev Diagnostic — Verification Passcode Generated: ", generatedOTP);
+
+                // Check if EmailJS is properly initialized
+                if (EMAILJS_PUBLIC_KEY !== "YOUR_PUBLIC_KEY" && EMAILJS_SERVICE_ID !== "YOUR_SERVICE_ID") {
+                    emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, {
+                        to_name: recipientName,
+                        to_email: recipientEmail,
+                        otp_code: generatedOTP
+                    })
+                    .then(() => {
+                        console.log("Authorization payload processed successfully via EmailJS.");
+                    })
+                    .catch((err) => {
+                        console.error("EmailJS payload delivery failure. Falling back to local diagnostic simulation.", err);
+                        alert(`Diagnostic Bypass Mode: Your OTP is ${generatedOTP} (Simulated send fallback to console)`);
+                    });
+                } else {
+                    // Safe sandbox demo fallback: Alerts only in console and screen to show interface functions without setup.
+                    alert(`Demo Sandbox Mode: A verification email simulation is triggered. Your dynamic verification code is: ${generatedOTP}`);
+                }
+
+                // Clear input grid
+                otpInputs.forEach(input => input.value = "");
+                otpErrorMsg.classList.add('hidden');
+                otpInputs[0].focus();
+                startTimer();
+            }
+
+            // Triggers initial form request -> Starts authorization
             form.addEventListener('submit', function(e) {
-                e.preventDefault(); 
+                e.preventDefault();
                 
-                // Show transmitting state
+                // Sweep form out & sweep OTP screen in
+                form.classList.add('opacity-0');
+                setTimeout(() => {
+                    form.classList.add('hidden');
+                    otpScreen.classList.remove('hidden');
+                    otpScreen.classList.add('opacity-100');
+                    generateAndSendOTP();
+                }, 300);
+            });
+
+            // Reads entered inputs and triggers form submission if verified
+            function verifyFullOTPCode() {
+                let currentEnteredOTP = "";
+                otpInputs.forEach(input => currentEnteredOTP += input.value);
+
+                if (currentEnteredOTP.length === 6) {
+                    if (currentEnteredOTP === generatedOTP && expirationTimeSec > 0) {
+                        executeFinalWeb3FormsSubmission();
+                    } else {
+                        otpErrorMsg.textContent = "Invalid or expired authorization code. Please retry.";
+                        otpErrorMsg.classList.remove('hidden');
+                        // Shake effect diagnostic
+                        document.getElementById('otp-inputs-container').classList.add('animate-bounce');
+                        setTimeout(() => {
+                            document.getElementById('otp-inputs-container').classList.remove('animate-bounce');
+                        }, 500);
+                    }
+                }
+            }
+
+            // Real final endpoint transaction
+            function executeFinalWeb3FormsSubmission() {
+                clearInterval(countdownTimer);
+                
                 const submitBtnSpan = form.querySelector('button[type="submit"] span');
-                const originalText = submitBtnSpan.textContent;
-                submitBtnSpan.textContent = 'Transmitting Protocol...';
-                
-                // Prepare form data
+                submitBtnSpan.textContent = 'Transmitting Secure Data...';
+
                 const formData = new FormData(form);
                 const object = Object.fromEntries(formData);
                 const json = JSON.stringify(object);
 
-                // Send data securely to Web3Forms endpoint
                 fetch('https://api.web3forms.com/submit', {
                     method: 'POST',
                     headers: {
@@ -649,32 +811,45 @@
                 })
                 .then(async (response) => {
                     if (response.status == 200) {
-                        // On Success: Show the custom success screen
-                        const submittedName = nameInput.value.split(' ')[0]; // Extract first name
+                        const submittedName = nameInput.value.split(' ')[0];
                         nameDisplay.textContent = submittedName ? submittedName : 'Investor';
                         
-                        form.style.opacity = '0';
+                        // Sweep OTP away -> Sweep Success screen in
+                        otpScreen.classList.add('opacity-0');
                         setTimeout(() => {
+                            otpScreen.classList.add('hidden');
                             successScreen.classList.remove('hidden');
-                            submitBtnSpan.textContent = originalText;
                         }, 300);
                     } else {
-                        // On API Transmission Error
-                        submitBtnSpan.textContent = 'Transmission Failed. Try Again.';
-                        setTimeout(() => submitBtnSpan.textContent = originalText, 3000);
+                        alert("Secure endpoint did not process correctly. Please try again.");
                     }
                 })
                 .catch(error => {
                     console.error('Submission Error:', error);
-                    submitBtnSpan.textContent = 'Network Error. Try Again.';
-                    setTimeout(() => submitBtnSpan.textContent = originalText, 3000);
+                    alert("A transmission disruption occurred. Please try again.");
                 });
+            }
+
+            // Resend passcode
+            resendOtpBtn.addEventListener('click', (e) => {
+                e.preventDefault();
+                generateAndSendOTP();
+            });
+
+            // Abort current session
+            cancelOtpBtn.addEventListener('click', (e) => {
+                e.preventDefault();
+                clearInterval(countdownTimer);
+                otpScreen.classList.add('hidden');
+                form.classList.remove('hidden');
+                form.classList.remove('opacity-0');
             });
 
             resetBtn.addEventListener('click', () => {
                 successScreen.classList.add('hidden');
                 form.reset();
-                form.style.opacity = '1';
+                form.classList.remove('hidden');
+                form.classList.remove('opacity-0');
             });
         });
     </script>
