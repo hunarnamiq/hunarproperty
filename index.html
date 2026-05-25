@@ -33,6 +33,9 @@
         }
     </script>
 
+    <!-- Web3Forms hCaptcha Verification Script -->
+    <script src="https://web3forms.com/client/script.js" async defer></script>
+
     <!-- Custom Styles for Animations & Interactions -->
     <style>
         body { background-color: #F8FAFC; color: #0B1426; }
@@ -134,7 +137,7 @@
             100% { transform: translate(-50%, -50%) scale(2); opacity: 0; }
         }
         
-        .nav-link { relative; }
+        .nav-link { position: relative; }
         .nav-link::after {
             content: ''; position: absolute; width: 0; height: 2px;
             bottom: -4px; left: 0; background-color: #D4AF37;
@@ -491,6 +494,11 @@
                         <textarea id="message" name="message" rows="4" required class="w-full bg-brand-light border border-gray-200 px-4 py-3 text-sm focus:outline-none focus:border-brand-gold focus:ring-1 focus:ring-brand-gold transition-colors text-brand-midnight resize-none"></textarea>
                     </div>
 
+                    <!-- hCaptcha Element integrated into the layout styling -->
+                    <div class="flex justify-center py-2">
+                        <div class="h-captcha" data-captcha="true"></div>
+                    </div>
+
                     <button type="submit" class="w-full bg-brand-midnight text-white py-4 uppercase tracking-widest text-sm font-semibold hover:bg-brand-gold hover:text-white transition-all shadow-md group relative overflow-hidden">
                         <span class="relative z-10">Submit Request Protocol</span>
                         <div class="absolute inset-0 bg-brand-gold transform scale-x-0 group-hover:scale-x-100 transition-transform origin-left duration-300 ease-out"></div>
@@ -690,6 +698,10 @@
                 successScreen.classList.add('hidden');
                 form.reset();
                 form.style.opacity = '1';
+                // Reset hCaptcha if initialized
+                if (typeof hcaptcha !== 'undefined') {
+                    hcaptcha.reset();
+                }
             });
         });
     </script>
