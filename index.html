@@ -1,1 +1,652 @@
 
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hunar Property Ltd | Elite Real Estate & Investment</title>
+    
+    <!-- Fonts: Playfair Display for elite headings, Inter for clean technical body -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&display=swap" rel="stylesheet">
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            light: '#F8FAFC',
+                            midnight: '#0B1426', // Cosmic Blue
+                            gold: '#D4AF37',     // Premium Gold/Amber
+                            goldhover: '#B5952F'
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        serif: ['Playfair Display', 'serif'],
+                    }
+                }
+            }
+        }
+    </script>
+
+    <!-- Custom Styles for Animations & Interactions -->
+    <style>
+        body { background-color: #F8FAFC; color: #0B1426; }
+        
+        /* Glassmorphism utilities */
+        .glass {
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border-bottom: 1px solid rgba(255,255,255,0.3);
+        }
+        .glass-dark {
+            background: rgba(11, 20, 38, 0.85);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(212, 175, 55, 0.2);
+        }
+
+        /* Hero Ken Burns Motion Background */
+        .hero-bg-container {
+            position: absolute;
+            inset: 0;
+            overflow: hidden;
+            z-index: -1;
+            background: #000;
+        }
+        .hero-bg-container::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(to bottom, rgba(11,20,38,0.3) 0%, rgba(248,250,252,1) 100%);
+            z-index: 2;
+        }
+        .hero-slide {
+            position: absolute;
+            inset: -10%; /* Oversize for Ken Burns */
+            width: 120%;
+            height: 120%;
+            background-size: cover;
+            background-position: center;
+            opacity: 0;
+            animation: kenburns 24s infinite;
+            z-index: 1;
+        }
+        .hero-slide:nth-child(1) { 
+            background-image: url('https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?ixlib=rb-4.0.3&auto=format&fit=crop&w=2000&q=80'); 
+            animation-delay: 0s; 
+        }
+        .hero-slide:nth-child(2) { 
+            background-image: url('https://images.unsplash.com/photo-1512917774080-9991f1c4c750?ixlib=rb-4.0.3&auto=format&fit=crop&w=2000&q=80'); 
+            animation-delay: 8s; 
+        }
+        .hero-slide:nth-child(3) { 
+            background-image: url('https://images.unsplash.com/photo-1600607687920-4e2a09be1587?ixlib=rb-4.0.3&auto=format&fit=crop&w=2000&q=80'); 
+            animation-delay: 16s; 
+        }
+
+        @keyframes kenburns {
+            0% { opacity: 0; transform: scale(1) translate(0, 0); }
+            10% { opacity: 1; }
+            33% { opacity: 1; transform: scale(1.05) translate(-1%, -1%); }
+            43% { opacity: 0; transform: scale(1.06) translate(-1.5%, -1.5%); }
+            100% { opacity: 0; transform: scale(1); }
+        }
+
+        /* Fade Up on Scroll */
+        .fade-up { opacity: 0; transform: translateY(30px); transition: all 0.8s cubic-bezier(0.16, 1, 0.3, 1); }
+        .fade-up.visible { opacity: 1; transform: translateY(0); }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: #F8FAFC; }
+        ::-webkit-scrollbar-thumb { background: #0B1426; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #D4AF37; }
+
+        /* Service Panel Transition */
+        .service-pane {
+            display: none;
+            animation: fadeInRight 0.5s ease forwards;
+        }
+        .service-pane.active { display: block; }
+        @keyframes fadeInRight {
+            from { opacity: 0; transform: translateX(20px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+
+        /* Map Pulser */
+        .pulse-ring {
+            position: absolute;
+            width: 40px; height: 40px;
+            background: rgba(212, 175, 55, 0.4);
+            border-radius: 50%;
+            top: 50%; left: 50%;
+            transform: translate(-50%, -50%);
+            animation: pulse 2s infinite;
+        }
+        @keyframes pulse {
+            0% { transform: translate(-50%, -50%) scale(0.5); opacity: 1; }
+            100% { transform: translate(-50%, -50%) scale(2); opacity: 0; }
+        }
+        
+        .nav-link { position: relative; }
+        .nav-link::after {
+            content: ''; position: absolute; width: 0; height: 2px;
+            bottom: -4px; left: 0; background-color: #D4AF37;
+            transition: width 0.3s ease;
+        }
+        .nav-link:hover::after { width: 100%; }
+    </style>
+</head>
+<body class="antialiased overflow-x-hidden">
+
+    <!-- Global Navigation -->
+    <header class="fixed top-0 left-0 w-full z-50 glass transition-all duration-300" id="header">
+        <div class="max-w-7xl mx-auto px-6 py-4 flex justify-between items-center">
+            
+            <!-- Branding -->
+            <a href="#" class="flex items-center gap-3 z-50 relative group">
+                <!-- Fallback if logo.png is missing: styled text -->
+                <div class="w-10 h-10 bg-brand-midnight text-brand-gold flex items-center justify-center font-serif text-xl font-bold rounded-sm border border-brand-gold">H</div>
+                <img src="logo.png" alt="Hunar Property Ltd" class="h-8 hidden group-hover:block absolute opacity-0 transition-opacity" onerror="this.style.display='none'">
+                <div class="flex flex-col">
+                    <span class="font-serif text-xl font-bold tracking-wide text-brand-midnight leading-none">HUNAR</span>
+                    <span class="text-[10px] tracking-[0.2em] text-gray-500 font-sans uppercase">Property Ltd</span>
+                </div>
+            </a>
+
+            <!-- Desktop Links -->
+            <nav class="hidden md:flex items-center gap-8 font-sans text-sm font-medium tracking-wide">
+                <a href="#about" class="nav-link text-brand-midnight hover:text-brand-gold transition-colors">About Us</a>
+                <a href="#services" class="nav-link text-brand-midnight hover:text-brand-gold transition-colors">Services</a>
+                <a href="#hq" class="nav-link text-brand-midnight hover:text-brand-gold transition-colors">Our HQ</a>
+                <a href="#contact" class="bg-brand-gold text-white px-6 py-2.5 rounded-sm hover:bg-brand-goldhover transition-all shadow-[0_4px_14px_0_rgba(212,175,55,0.39)] uppercase text-xs tracking-wider font-semibold">Request Consultation</a>
+            </nav>
+
+            <!-- Mobile Hamburger -->
+            <button id="mobile-menu-btn" class="md:hidden z-50 text-brand-midnight p-2 focus:outline-none">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="square" stroke-linejoin="miter" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path></svg>
+            </button>
+        </div>
+
+        <!-- Mobile Drawer -->
+        <div id="mobile-menu" class="fixed inset-0 bg-brand-light flex flex-col justify-center items-center gap-8 transform translate-x-full transition-transform duration-500 ease-in-out z-40">
+            <a href="#about" class="text-3xl font-serif text-brand-midnight mobile-link">About Us</a>
+            <a href="#services" class="text-3xl font-serif text-brand-midnight mobile-link">Services</a>
+            <a href="#hq" class="text-3xl font-serif text-brand-midnight mobile-link">Our HQ</a>
+            <a href="#contact" class="mt-8 bg-brand-midnight text-brand-gold px-8 py-4 border border-brand-gold mobile-link text-sm tracking-widest uppercase">Request Consultation</a>
+        </div>
+    </header>
+
+    <!-- High-Conversion Hero Zone -->
+    <section class="relative min-h-screen flex items-center pt-24 pb-12 overflow-hidden">
+        <div class="hero-bg-container">
+            <div class="hero-slide"></div>
+            <div class="hero-slide"></div>
+            <div class="hero-slide"></div>
+        </div>
+
+        <div class="max-w-7xl mx-auto px-6 relative z-10 w-full mt-20">
+            <div class="max-w-3xl fade-up">
+                <div class="inline-block px-4 py-1 border border-brand-midnight/20 bg-white/50 backdrop-blur-sm rounded-full text-xs font-semibold tracking-widest uppercase text-brand-midnight mb-6">
+                    Elite Property Syndicate
+                </div>
+                <h1 class="text-5xl md:text-7xl font-serif text-brand-midnight leading-[1.1] mb-6">
+                    Architecting Wealth Through <span class="italic text-brand-gold">Intelligent</span> Real Estate.
+                </h1>
+                <p class="text-lg md:text-xl text-gray-700 font-sans max-w-2xl leading-relaxed mb-10">
+                    Hunar Property Ltd is Peterborough’s localized, end-to-end investment architect. We engineer high-yield, secure property portfolios for discerning private and institutional capital.
+                </p>
+                <div class="flex flex-wrap gap-4">
+                    <a href="#services" class="bg-brand-midnight text-white px-8 py-4 text-sm tracking-widest uppercase hover:bg-gray-800 transition-colors border border-transparent">Explore Expertise</a>
+                    <a href="#contact" class="bg-white/80 backdrop-blur text-brand-midnight border border-brand-midnight/20 px-8 py-4 text-sm tracking-widest uppercase hover:border-brand-gold hover:text-brand-gold transition-all">Discuss Your Portfolio</a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Interactive Service Directory -->
+    <section id="services" class="py-24 bg-white relative z-10">
+        <div class="max-w-7xl mx-auto px-6">
+            <div class="flex flex-col md:flex-row justify-between items-end mb-16 fade-up">
+                <div>
+                    <h2 class="text-4xl md:text-5xl font-serif text-brand-midnight mb-4">Core Competencies</h2>
+                    <p class="text-gray-500 max-w-lg">A unified, precision-engineered approach to real estate lifecycle management.</p>
+                </div>
+            </div>
+
+            <div class="flex flex-col lg:flex-row gap-12 lg:gap-24">
+                <!-- Navigation Sidebar -->
+                <div class="lg:w-1/3 flex flex-col gap-2 fade-up">
+                    <button class="service-btn active text-left px-6 py-4 border-l-2 border-brand-gold bg-brand-light text-brand-midnight font-medium transition-all" data-target="sourcing">Property Investment Sourcing</button>
+                    <button class="service-btn text-left px-6 py-4 border-l-2 border-transparent text-gray-500 hover:bg-brand-light hover:text-brand-midnight transition-all" data-target="management">Management & Compliance</button>
+                    <button class="service-btn text-left px-6 py-4 border-l-2 border-transparent text-gray-500 hover:bg-brand-light hover:text-brand-midnight transition-all" data-target="commercial">Commercial Properties</button>
+                    <button class="service-btn text-left px-6 py-4 border-l-2 border-transparent text-gray-500 hover:bg-brand-light hover:text-brand-midnight transition-all" data-target="residential">Residential Properties</button>
+                    <button class="service-btn text-left px-6 py-4 border-l-2 border-transparent text-gray-500 hover:bg-brand-light hover:text-brand-midnight transition-all" data-target="btl">Buy to Let (BTL)</button>
+                    <button class="service-btn text-left px-6 py-4 border-l-2 border-transparent text-gray-500 hover:bg-brand-light hover:text-brand-midnight transition-all" data-target="buildtolet">Build to Let (JV)</button>
+                    <button class="service-btn text-left px-6 py-4 border-l-2 border-transparent text-gray-500 hover:bg-brand-light hover:text-brand-midnight transition-all" data-target="contractors">Master Refurbishment Panel</button>
+                </div>
+
+                <!-- Content Area -->
+                <div class="lg:w-2/3 fade-up" id="service-content-container">
+                    
+                    <!-- Pane 1: Sourcing -->
+                    <div id="sourcing" class="service-pane active">
+                        <h3 class="text-3xl font-serif text-brand-midnight mb-6">Property Investment Sourcing</h3>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
+                            <div class="bg-brand-light p-6 rounded-sm border border-gray-100">
+                                <h4 class="text-xs uppercase tracking-widest text-brand-gold font-bold mb-2">Market Insights</h4>
+                                <p class="text-sm text-gray-600">Leveraging hyper-local data in Peterborough to identify undervalued assets pre-market.</p>
+                            </div>
+                            <div class="bg-brand-light p-6 rounded-sm border border-gray-100">
+                                <h4 class="text-xs uppercase tracking-widest text-brand-gold font-bold mb-2">Asset Tier</h4>
+                                <p class="text-sm text-gray-600">Class B & C value-add opportunities converting to Class A institutional grade.</p>
+                            </div>
+                        </div>
+                        <h4 class="font-bold text-brand-midnight mb-3 border-b pb-2">Scope of Work</h4>
+                        <ul class="space-y-3 text-gray-600 text-sm mb-6">
+                            <li class="flex items-start gap-2"><span class="text-brand-gold">▸</span> Extensive due diligence & viability modeling.</li>
+                            <li class="flex items-start gap-2"><span class="text-brand-gold">▸</span> Off-market acquisition negotiations.</li>
+                            <li class="flex items-start gap-2"><span class="text-brand-gold">▸</span> Turnkey legal and structural conveyance facilitation.</li>
+                        </ul>
+                    </div>
+
+                    <!-- Pane 2: Management -->
+                    <div id="management" class="service-pane">
+                        <h3 class="text-3xl font-serif text-brand-midnight mb-6">Management & Compliance</h3>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
+                            <div class="bg-brand-light p-6 rounded-sm border border-gray-100">
+                                <h4 class="text-xs uppercase tracking-widest text-brand-gold font-bold mb-2">Tenant Demographics</h4>
+                                <p class="text-sm text-gray-600">Vetted corporate professionals and high-income local families ensuring zero voids.</p>
+                            </div>
+                            <div class="bg-brand-light p-6 rounded-sm border border-gray-100">
+                                <h4 class="text-xs uppercase tracking-widest text-brand-gold font-bold mb-2">Regulatory Standard</h4>
+                                <p class="text-sm text-gray-600">100% compliance with local authority licensing and national safety legislation.</p>
+                            </div>
+                        </div>
+                        <h4 class="font-bold text-brand-midnight mb-3 border-b pb-2">Scope of Work</h4>
+                        <ul class="space-y-3 text-gray-600 text-sm mb-6">
+                            <li class="flex items-start gap-2"><span class="text-brand-gold">▸</span> 24/7 reactive and planned maintenance.</li>
+                            <li class="flex items-start gap-2"><span class="text-brand-gold">▸</span> Rigorous rent collection and arrears management.</li>
+                            <li class="flex items-start gap-2"><span class="text-brand-gold">▸</span> Quarterly algorithmic portfolio performance reports.</li>
+                        </ul>
+                    </div>
+
+                     <!-- Pane 3: Commercial -->
+                    <div id="commercial" class="service-pane">
+                        <h3 class="text-3xl font-serif text-brand-midnight mb-6">Commercial Properties</h3>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
+                            <div class="bg-brand-light p-6 rounded-sm border border-gray-100">
+                                <h4 class="text-xs uppercase tracking-widest text-brand-gold font-bold mb-2">Market Insights</h4>
+                                <p class="text-sm text-gray-600">Capitalizing on Peterborough's growing commercial hub and business park expansion.</p>
+                            </div>
+                            <div class="bg-brand-light p-6 rounded-sm border border-gray-100">
+                                <h4 class="text-xs uppercase tracking-widest text-brand-gold font-bold mb-2">Asset Tier</h4>
+                                <p class="text-sm text-gray-600">Retail units, office space, and light industrial warehousing.</p>
+                            </div>
+                        </div>
+                        <h4 class="font-bold text-brand-midnight mb-3 border-b pb-2">Scope of Work</h4>
+                        <ul class="space-y-3 text-gray-600 text-sm mb-6">
+                            <li class="flex items-start gap-2"><span class="text-brand-gold">▸</span> Lease negotiation and covenant strength analysis.</li>
+                            <li class="flex items-start gap-2"><span class="text-brand-gold">▸</span> Commercial fit-out project management.</li>
+                            <li class="flex items-start gap-2"><span class="text-brand-gold">▸</span> Change-of-use planning permission facilitation.</li>
+                        </ul>
+                    </div>
+
+                    <!-- Pane 4: Residential -->
+                    <div id="residential" class="service-pane">
+                        <h3 class="text-3xl font-serif text-brand-midnight mb-6">Residential Properties</h3>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
+                            <div class="bg-brand-light p-6 rounded-sm border border-gray-100">
+                                <h4 class="text-xs uppercase tracking-widest text-brand-gold font-bold mb-2">Market Insights</h4>
+                                <p class="text-sm text-gray-600">Addressing the housing deficit with premium living spaces in commuter-belt zones.</p>
+                            </div>
+                            <div class="bg-brand-light p-6 rounded-sm border border-gray-100">
+                                <h4 class="text-xs uppercase tracking-widest text-brand-gold font-bold mb-2">Demographics</h4>
+                                <p class="text-sm text-gray-600">First-time buyers, downgraders, and executive renters seeking modern amenities.</p>
+                            </div>
+                        </div>
+                        <h4 class="font-bold text-brand-midnight mb-3 border-b pb-2">Scope of Work</h4>
+                        <ul class="space-y-3 text-gray-600 text-sm mb-6">
+                            <li class="flex items-start gap-2"><span class="text-brand-gold">▸</span> High-spec internal modernization.</li>
+                            <li class="flex items-start gap-2"><span class="text-brand-gold">▸</span> Energy efficiency (EPC) upgrades for future-proofing.</li>
+                            <li class="flex items-start gap-2"><span class="text-brand-gold">▸</span> Staging and premium market positioning.</li>
+                        </ul>
+                    </div>
+
+                    <!-- Pane 5: BTL -->
+                    <div id="btl" class="service-pane">
+                        <h3 class="text-3xl font-serif text-brand-midnight mb-6">Buy to Let (BTL)</h3>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
+                            <div class="bg-brand-light p-6 rounded-sm border border-gray-100">
+                                <h4 class="text-xs uppercase tracking-widest text-brand-gold font-bold mb-2">Yield Architecture</h4>
+                                <p class="text-sm text-gray-600">Targeting 7-10% gross yields via strategic acquisition and cosmetic uplift.</p>
+                            </div>
+                            <div class="bg-brand-light p-6 rounded-sm border border-gray-100">
+                                <h4 class="text-xs uppercase tracking-widest text-brand-gold font-bold mb-2">Asset Tier</h4>
+                                <p class="text-sm text-gray-600">HMOs (Houses in Multiple Occupation) and single-let family residences.</p>
+                            </div>
+                        </div>
+                        <h4 class="font-bold text-brand-midnight mb-3 border-b pb-2">Scope of Work</h4>
+                        <ul class="space-y-3 text-gray-600 text-sm mb-6">
+                            <li class="flex items-start gap-2"><span class="text-brand-gold">▸</span> BRRR (Buy, Refurbish, Refinance, Rent) strategy execution.</li>
+                            <li class="flex items-start gap-2"><span class="text-brand-gold">▸</span> Article 4 direction navigation and HMO licensing.</li>
+                            <li class="flex items-start gap-2"><span class="text-brand-gold">▸</span> Seamless tenant onboarding.</li>
+                        </ul>
+                    </div>
+
+                    <!-- Pane 6: Build to Let -->
+                    <div id="buildtolet" class="service-pane">
+                        <h3 class="text-3xl font-serif text-brand-midnight mb-6">Build to Let (Developer JVs)</h3>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
+                            <div class="bg-brand-light p-6 rounded-sm border border-gray-100">
+                                <h4 class="text-xs uppercase tracking-widest text-brand-gold font-bold mb-2">Partnership Model</h4>
+                                <p class="text-sm text-gray-600">Joint ventures structured for risk mitigation and profit maximization.</p>
+                            </div>
+                            <div class="bg-brand-light p-6 rounded-sm border border-gray-100">
+                                <h4 class="text-xs uppercase tracking-widest text-brand-gold font-bold mb-2">Scale</h4>
+                                <p class="text-sm text-gray-600">From micro-developments to multi-unit residential blocks.</p>
+                            </div>
+                        </div>
+                        <h4 class="font-bold text-brand-midnight mb-3 border-b pb-2">Scope of Work</h4>
+                        <ul class="space-y-3 text-gray-600 text-sm mb-6">
+                            <li class="flex items-start gap-2"><span class="text-brand-gold">▸</span> Land acquisition and planning uplift strategies.</li>
+                            <li class="flex items-start gap-2"><span class="text-brand-gold">▸</span> End-to-end development oversight.</li>
+                            <li class="flex items-start gap-2"><span class="text-brand-gold">▸</span> Exit strategy alignment (Block sale vs. retained yield).</li>
+                        </ul>
+                    </div>
+
+                    <!-- Pane 7: Contractors -->
+                    <div id="contractors" class="service-pane">
+                        <h3 class="text-3xl font-serif text-brand-midnight mb-6">Master Refurbishment Panel</h3>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
+                            <div class="bg-brand-light p-6 rounded-sm border border-gray-100">
+                                <h4 class="text-xs uppercase tracking-widest text-brand-gold font-bold mb-2">Quality Control</h4>
+                                <p class="text-sm text-gray-600">In-house vetting of all trades ensures institutional-grade finish within budget.</p>
+                            </div>
+                            <div class="bg-brand-light p-6 rounded-sm border border-gray-100">
+                                <h4 class="text-xs uppercase tracking-widest text-brand-gold font-bold mb-2">Velocity</h4>
+                                <p class="text-sm text-gray-600">Optimized critical paths to minimize void periods during development.</p>
+                            </div>
+                        </div>
+                        <h4 class="font-bold text-brand-midnight mb-3 border-b pb-2">Scope of Work</h4>
+                        <ul class="space-y-3 text-gray-600 text-sm mb-6">
+                            <li class="flex items-start gap-2"><span class="text-brand-gold">▸</span> Full strip-out and structural reconfiguration.</li>
+                            <li class="flex items-start gap-2"><span class="text-brand-gold">▸</span> Bespoke interior architecture and finish scheduling.</li>
+                            <li class="flex items-start gap-2"><span class="text-brand-gold">▸</span> JCT Contract administration and final sign-off.</li>
+                        </ul>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Geographic Footprint (Our HQ) -->
+    <section id="hq" class="py-24 bg-brand-midnight text-white relative overflow-hidden">
+        <!-- Blueprint Grid Background -->
+        <div class="absolute inset-0 opacity-10" style="background-image: linear-gradient(rgba(255,255,255,0.2) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.2) 1px, transparent 1px); background-size: 40px 40px;"></div>
+        
+        <div class="max-w-7xl mx-auto px-6 relative z-10 flex flex-col lg:flex-row gap-16 items-center">
+            
+            <div class="lg:w-1/2 fade-up">
+                <h2 class="text-4xl md:text-5xl font-serif mb-6"><span class="text-brand-gold">Strategic</span> Base of Operations.</h2>
+                <p class="text-gray-400 mb-8 max-w-md leading-relaxed">
+                    Positioned at the heart of the city's regeneration zone, our headquarters serves as the nexus for our local intelligence network and command center for asset management.
+                </p>
+                <div class="border-l-2 border-brand-gold pl-6 py-2">
+                    <h4 class="font-serif text-2xl mb-1">12 Fitzwilliam Street</h4>
+                    <p class="text-gray-300">Peterborough, England</p>
+                    <p class="text-brand-gold text-sm tracking-widest mt-1">PE1 2RX</p>
+                </div>
+            </div>
+
+            <!-- Stylized Vector Street Map -->
+            <div class="lg:w-1/2 w-full aspect-square md:aspect-video lg:aspect-square relative glass-dark rounded-xl border border-white/10 fade-up overflow-hidden">
+                <div class="absolute inset-0 bg-brand-midnight/50"></div>
+                
+                <!-- Abstract Map Lines -->
+                <svg class="absolute inset-0 w-full h-full opacity-30" viewBox="0 0 100 100" preserveAspectRatio="none">
+                    <path d="M 10 0 L 10 100 M 30 0 L 30 100 M 70 0 L 70 100 M 90 0 L 90 100" stroke="#fff" stroke-width="0.2"/>
+                    <path d="M 0 20 L 100 20 M 0 60 L 100 60 M 0 80 L 100 80" stroke="#fff" stroke-width="0.2"/>
+                    <path d="M 30 20 L 70 60 M 70 20 L 30 80" stroke="#D4AF37" stroke-width="0.5" opacity="0.5"/>
+                </svg>
+
+                <!-- Map Nodes -->
+                <!-- Station -->
+                <div class="absolute top-[20%] left-[20%] transform -translate-x-1/2 -translate-y-1/2 flex flex-col items-center group cursor-pointer">
+                    <div class="w-3 h-3 bg-white rounded-full relative z-10 transition-transform group-hover:scale-125"></div>
+                    <div class="mt-2 text-[10px] font-sans tracking-wider uppercase text-gray-400 bg-brand-midnight px-2 py-1 rounded border border-white/10 whitespace-nowrap">Station <br> <span class="text-brand-gold text-[8px]">12 Min Walk</span></div>
+                </div>
+
+                <!-- Town Square -->
+                <div class="absolute top-[60%] left-[80%] transform -translate-x-1/2 -translate-y-1/2 flex flex-col items-center group cursor-pointer">
+                    <div class="w-3 h-3 bg-white rounded-full relative z-10 transition-transform group-hover:scale-125"></div>
+                    <div class="mt-2 text-[10px] font-sans tracking-wider uppercase text-gray-400 bg-brand-midnight px-2 py-1 rounded border border-white/10 whitespace-nowrap">Town Square <br> <span class="text-brand-gold text-[8px]">5 Min Walk</span></div>
+                </div>
+
+                <!-- Hunar HQ (Pulsing) -->
+                <div class="absolute top-[50%] left-[50%] transform -translate-x-1/2 -translate-y-1/2 flex flex-col items-center">
+                    <div class="pulse-ring"></div>
+                    <div class="w-5 h-5 bg-brand-gold rounded-sm transform rotate-45 relative z-10 shadow-[0_0_15px_rgba(212,175,55,0.8)] border border-white"></div>
+                    <div class="mt-4 text-xs font-sans font-bold tracking-widest uppercase text-white bg-brand-midnight/90 backdrop-blur px-3 py-1.5 border border-brand-gold shadow-lg whitespace-nowrap z-20">
+                        Hunar HQ
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Spam-Safe Interactive Webform -->
+    <section id="contact" class="py-24 bg-brand-light relative">
+        <div class="max-w-4xl mx-auto px-6 relative z-10 fade-up">
+            <div class="text-center mb-12">
+                <h2 class="text-4xl md:text-5xl font-serif text-brand-midnight mb-4">Initiate Acquisition.</h2>
+                <p class="text-gray-500 max-w-xl mx-auto">Connect directly with our investment directors. To maintain absolute security and discretion, all inquiries are processed exclusively via this secure structural endpoint.</p>
+            </div>
+
+            <!-- Form Container -->
+            <div class="bg-white p-8 md:p-12 shadow-[0_20px_50px_rgba(11,20,38,0.05)] border border-gray-100 rounded-sm relative overflow-hidden" id="form-container">
+                
+                <form id="secure-contact-form" action="https://api.web3forms.com/submit" method="POST" class="space-y-6 relative z-10">
+                    <!-- Web3Forms Config (Using placeholder dummy key for security logic structure) -->
+                    <input type="hidden" name="access_key" value="YOUR_ACCESS_KEY_HERE">
+                    <input type="hidden" name="subject" value="New Portfolio Inquiry - Hunar Property Ltd">
+                    <input type="checkbox" name="botcheck" class="hidden" style="display: none;">
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div class="space-y-2">
+                            <label for="name" class="text-xs uppercase tracking-widest text-brand-midnight font-bold">Principal Name</label>
+                            <input type="text" id="name" name="name" required class="w-full bg-brand-light border border-gray-200 px-4 py-3 text-sm focus:outline-none focus:border-brand-gold focus:ring-1 focus:ring-brand-gold transition-colors text-brand-midnight">
+                        </div>
+                        <div class="space-y-2">
+                            <label for="email" class="text-xs uppercase tracking-widest text-brand-midnight font-bold">Secure Email</label>
+                            <input type="email" id="email" name="email" required class="w-full bg-brand-light border border-gray-200 px-4 py-3 text-sm focus:outline-none focus:border-brand-gold focus:ring-1 focus:ring-brand-gold transition-colors text-brand-midnight">
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div class="space-y-2">
+                            <label for="phone" class="text-xs uppercase tracking-widest text-brand-midnight font-bold">Direct Contact Number</label>
+                            <input type="tel" id="phone" name="phone" required class="w-full bg-brand-light border border-gray-200 px-4 py-3 text-sm focus:outline-none focus:border-brand-gold focus:ring-1 focus:ring-brand-gold transition-colors text-brand-midnight">
+                        </div>
+                        <div class="space-y-2">
+                            <label for="interest" class="text-xs uppercase tracking-widest text-brand-midnight font-bold">Primary Asset Interest</label>
+                            <select id="interest" name="interest" class="w-full bg-brand-light border border-gray-200 px-4 py-3 text-sm focus:outline-none focus:border-brand-gold focus:ring-1 focus:ring-brand-gold transition-colors text-brand-midnight appearance-none">
+                                <option value="Sourcing">Investment Sourcing</option>
+                                <option value="Management">Portfolio Management</option>
+                                <option value="Commercial">Commercial Assets</option>
+                                <option value="JointVenture">Joint Venture / Build to Let</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="space-y-2">
+                        <label for="goals" class="text-xs uppercase tracking-widest text-brand-midnight font-bold">Strategic Goals & Capital Deployment</label>
+                        <textarea id="goals" name="goals" rows="4" required class="w-full bg-brand-light border border-gray-200 px-4 py-3 text-sm focus:outline-none focus:border-brand-gold focus:ring-1 focus:ring-brand-gold transition-colors text-brand-midnight resize-none"></textarea>
+                    </div>
+
+                    <button type="submit" class="w-full bg-brand-midnight text-white py-4 uppercase tracking-widest text-sm font-semibold hover:bg-brand-gold hover:text-white transition-all shadow-md group relative overflow-hidden">
+                        <span class="relative z-10">Submit Request Protocol</span>
+                        <div class="absolute inset-0 bg-brand-gold transform scale-x-0 group-hover:scale-x-100 transition-transform origin-left duration-300 ease-out"></div>
+                    </button>
+                    
+                    <p class="text-[10px] text-gray-400 text-center uppercase tracking-wider mt-4">Data handled strictly in accordance with GDPR protocols. End-to-end encryption active.</p>
+                </form>
+
+                <!-- Stateful Success Screen (Hidden by default) -->
+                <div id="success-screen" class="hidden absolute inset-0 bg-brand-midnight z-20 flex flex-col items-center justify-center text-center p-8">
+                    <div class="w-16 h-16 border-2 border-brand-gold rounded-full flex items-center justify-center mb-6">
+                        <svg class="w-8 h-8 text-brand-gold" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="square" stroke-linejoin="miter" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                    </div>
+                    <h3 class="text-3xl font-serif text-white mb-4">Protocol Received, <span id="investor-name" class="text-brand-gold italic">Investor</span>.</h3>
+                    <p class="text-gray-400 font-sans max-w-md mb-8">
+                        Your structural payload has been securely routed to our senior directors. You can expect a highly discrete, targeted response within 12 business hours to establish next steps.
+                    </p>
+                    <button id="reset-form" class="text-xs uppercase tracking-widest text-brand-gold border-b border-brand-gold pb-1 hover:text-white hover:border-white transition-colors">Return to Directory</button>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Secure Footer (No raw data) -->
+    <footer class="bg-brand-midnight text-gray-400 py-12 border-t border-white/10">
+        <div class="max-w-7xl mx-auto px-6 flex flex-col md:flex-row justify-between items-center gap-6">
+            <div class="flex items-center gap-2">
+                <div class="w-6 h-6 bg-brand-gold text-brand-midnight flex items-center justify-center font-serif text-xs font-bold rounded-sm">H</div>
+                <span class="text-white font-serif tracking-widest text-sm uppercase">Hunar Property Ltd</span>
+            </div>
+            
+            <div class="flex gap-6 text-xs uppercase tracking-wider">
+                <a href="#" class="hover:text-brand-gold transition-colors">Privacy Protocol</a>
+                <a href="#" class="hover:text-brand-gold transition-colors">Terms of Syndicate</a>
+                <a href="#" class="hover:text-brand-gold transition-colors">Compliance</a>
+            </div>
+
+            <div class="text-xs text-gray-600">
+                &copy; 2026 Hunar Property Ltd. All rights reserved.
+            </div>
+        </div>
+    </footer>
+
+    <!-- Interactive Logic Engine -->
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            
+            // 1. Mobile Menu Toggle
+            const mobileMenuBtn = document.getElementById('mobile-menu-btn');
+            const mobileMenu = document.getElementById('mobile-menu');
+            const mobileLinks = document.querySelectorAll('.mobile-link');
+            let menuOpen = false;
+
+            function toggleMenu() {
+                menuOpen = !menuOpen;
+                if (menuOpen) {
+                    mobileMenu.classList.remove('translate-x-full');
+                    mobileMenuBtn.innerHTML = '<svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="square" stroke-linejoin="miter" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>';
+                } else {
+                    mobileMenu.classList.add('translate-x-full');
+                    mobileMenuBtn.innerHTML = '<svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="square" stroke-linejoin="miter" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path></svg>';
+                }
+            }
+
+            mobileMenuBtn.addEventListener('click', toggleMenu);
+            mobileLinks.forEach(link => {
+                link.addEventListener('click', () => {
+                    if(menuOpen) toggleMenu();
+                });
+            });
+
+            // 2. Header Background on Scroll
+            const header = document.getElementById('header');
+            window.addEventListener('scroll', () => {
+                if (window.scrollY > 50) {
+                    header.classList.add('shadow-md');
+                } else {
+                    header.classList.remove('shadow-md');
+                }
+            });
+
+            // 3. Stateful Service Directory Logic
+            const serviceBtns = document.querySelectorAll('.service-btn');
+            const servicePanes = document.querySelectorAll('.service-pane');
+
+            serviceBtns.forEach(btn => {
+                btn.addEventListener('click', () => {
+                    // Reset Buttons
+                    serviceBtns.forEach(b => {
+                        b.classList.remove('active', 'border-brand-gold', 'bg-brand-light', 'text-brand-midnight');
+                        b.classList.add('border-transparent', 'text-gray-500');
+                    });
+                    
+                    // Activate Clicked
+                    btn.classList.add('active', 'border-brand-gold', 'bg-brand-light', 'text-brand-midnight');
+                    btn.classList.remove('border-transparent', 'text-gray-500');
+
+                    // Swap Panes
+                    const targetId = btn.getAttribute('data-target');
+                    servicePanes.forEach(pane => {
+                        pane.classList.remove('active');
+                        // Small trick to reset animation
+                        pane.style.animation = 'none';
+                        pane.offsetHeight; /* trigger reflow */
+                        pane.style.animation = null; 
+                    });
+                    document.getElementById(targetId).classList.add('active');
+                });
+            });
+
+            // 4. Scroll Intersection Observer for Fade-ups
+            const fadeElements = document.querySelectorAll('.fade-up');
+            const appearOptions = {
+                threshold: 0.15,
+                rootMargin: "0px 0px -50px 0px"
+            };
+
+            const appearOnScroll = new IntersectionObserver(function(entries, observer) {
+                entries.forEach(entry => {
+                    if (!entry.isIntersecting) return;
+                    entry.target.classList.add('visible');
+                    observer.unobserve(entry.target);
+                });
+            }, appearOptions);
+
+            fadeElements.forEach(el => appearOnScroll.observe(el));
+
+            // 5. Stateful Form Submission Logic
+            const form = document.getElementById('secure-contact-form');
+            const successScreen = document.getElementById('success-screen');
+            const nameInput = document.getElementById('name');
+            const nameDisplay = document.getElementById('investor-name');
+            const resetBtn = document.getElementById('reset-form');
+
+            form.addEventListener('submit', function(e) {
+                e.preventDefault(); 
+                
+                // In a real environment, allow Web3Forms to submit via fetch
+                // For this UI demonstration, we intercept to show the success state
+                
+                const submittedName = nameInput.value.split(' ')[0]; // Get first name
+                nameDisplay.textContent = submittedName ? submittedName : 'Investor';
+                
+                form.style.opacity = '0';
+                setTimeout(() => {
+                    successScreen.classList.remove('hidden');
+                }, 300);
+            });
+
+            resetBtn.addEventListener('click', () => {
+                successScreen.classList.add('hidden');
+                form.reset();
+                form.style.opacity = '1';
+            });
+        });
+    </script>
+</body>
+</html>
